@@ -1,0 +1,2359 @@
+{
+  "openapi": "3.1.0",
+  "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
+  "info": {
+    "title": "DiCompute API",
+    "version": "1.0",
+    "description": "Generated from apps/console/app/api-console/content.ts (endpoint list) and packages/protocol/src/index.ts + multi-protocol.ts (request/response schemas, where a shared Zod schema exists) by scripts/generate-openapi.ts. Do not hand-edit this file -- see docs/reference/openapi.md."
+  },
+  "servers": [
+    {
+      "url": "https://dicompute.ai/openai",
+      "description": "This deployment's default host (docs/consumer/quickstart.md); a self-hosted deployment's own origin replaces this."
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "`Authorization: Bearer <api-key>` -- see docs/consumer/authentication.md."
+      }
+    },
+    "schemas": {
+      "ChatCompletionRequest": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string"
+          },
+          "models": {
+            "maxItems": 4,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 256
+            }
+          },
+          "messages": {
+            "minItems": 1,
+            "maxItems": 1000,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role": {
+                  "type": "string",
+                  "enum": [
+                    "system",
+                    "user",
+                    "assistant",
+                    "tool",
+                    "developer"
+                  ]
+                },
+                "content": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "maxLength": 200000
+                        },
+                        {
+                          "maxItems": 64,
+                          "type": "array",
+                          "items": {
+                            "anyOf": [
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "const": "text"
+                                  },
+                                  "text": {
+                                    "type": "string",
+                                    "maxLength": 200000
+                                  }
+                                },
+                                "required": [
+                                  "type",
+                                  "text"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "const": "image_url"
+                                  },
+                                  "image_url": {
+                                    "type": "object",
+                                    "properties": {
+                                      "url": {
+                                        "type": "string",
+                                        "minLength": 1
+                                      },
+                                      "detail": {
+                                        "type": "string",
+                                        "enum": [
+                                          "auto",
+                                          "low",
+                                          "high"
+                                        ]
+                                      }
+                                    },
+                                    "required": [
+                                      "url"
+                                    ],
+                                    "additionalProperties": false
+                                  }
+                                },
+                                "required": [
+                                  "type",
+                                  "image_url"
+                                ],
+                                "additionalProperties": false
+                              },
+                              {
+                                "type": "object",
+                                "properties": {
+                                  "type": {
+                                    "type": "string",
+                                    "enum": [
+                                      "input_audio",
+                                      "file",
+                                      "input_image",
+                                      "refusal"
+                                    ]
+                                  }
+                                },
+                                "required": [
+                                  "type"
+                                ],
+                                "additionalProperties": {}
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                },
+                "name": {
+                  "type": "string",
+                  "maxLength": 256
+                },
+                "tool_calls": {
+                  "maxItems": 128,
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "type": {
+                        "type": "string",
+                        "const": "function"
+                      },
+                      "function": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "arguments": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "name",
+                          "arguments"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "type",
+                      "function"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "tool_call_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 256
+                }
+              },
+              "required": [
+                "role"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "stream": {
+            "default": false,
+            "type": "boolean"
+          },
+          "max_tokens": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 200000
+          },
+          "max_completion_tokens": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 200000
+          },
+          "temperature": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2
+          },
+          "top_p": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "seed": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "stop": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "maxItems": 4,
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          },
+          "presence_penalty": {
+            "type": "number",
+            "minimum": -2,
+            "maximum": 2
+          },
+          "frequency_penalty": {
+            "type": "number",
+            "minimum": -2,
+            "maximum": 2
+          },
+          "response_format": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": {}
+          },
+          "logit_bias": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "number",
+              "minimum": -100,
+              "maximum": 100
+            }
+          },
+          "top_k": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "min_p": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "tools": {
+            "maxItems": 128,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "const": "function"
+                },
+                "function": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 256,
+                      "pattern": "^[A-Za-z0-9_-]+$"
+                    },
+                    "description": {
+                      "type": "string",
+                      "maxLength": 4096
+                    },
+                    "parameters": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {}
+                    },
+                    "strict": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "name"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": [
+                "type",
+                "function"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "tool_choice": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "none"
+              },
+              {
+                "type": "string",
+                "const": "auto"
+              },
+              {
+                "type": "string",
+                "const": "required"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "function"
+                  },
+                  "function": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": [
+                      "name"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "type",
+                  "function"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "parallel_tool_calls": {
+            "type": "boolean"
+          },
+          "reasoning_effort": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "logprobs": {
+            "type": "boolean"
+          },
+          "top_logprobs": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 20
+          },
+          "user": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          },
+          "stream_options": {
+            "type": "object",
+            "properties": {
+              "include_usage": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "include_usage"
+            ],
+            "additionalProperties": false
+          },
+          "n": {
+            "type": "number"
+          },
+          "modalities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "service_tier": {
+            "type": "string"
+          },
+          "store": {
+            "type": "boolean"
+          },
+          "web_search": {
+            "type": "boolean"
+          },
+          "prompt_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "prompt_label": {
+            "type": "string",
+            "pattern": "^[a-z0-9_.:-]{1,64}$"
+          },
+          "prompt_version": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "preset_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "preset_label": {
+            "type": "string",
+            "pattern": "^[a-z0-9_.:-]{1,64}$"
+          },
+          "preset_version": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "tags": {
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9_.:-]{1,64}$"
+            }
+          }
+        },
+        "required": [
+          "model",
+          "messages",
+          "stream"
+        ],
+        "additionalProperties": false
+      },
+      "ChatCompletionResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "created": {
+            "type": "number"
+          },
+          "model": {
+            "type": "string"
+          },
+          "choices": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "number"
+                },
+                "message": {
+                  "type": "object",
+                  "properties": {
+                    "role": {
+                      "type": "string"
+                    },
+                    "content": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "reasoning_content": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "tool_calls": {
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "type": {
+                                "type": "string"
+                              },
+                              "function": {
+                                "type": "object",
+                                "properties": {
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "arguments": {
+                                    "type": "string"
+                                  }
+                                },
+                                "additionalProperties": false
+                              }
+                            },
+                            "additionalProperties": false
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "finish_reason": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "message"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "usage": {
+            "type": "object",
+            "properties": {
+              "prompt_tokens": {
+                "type": "number"
+              },
+              "completion_tokens": {
+                "type": "number"
+              },
+              "total_tokens": {
+                "type": "number"
+              },
+              "completion_tokens_details": {
+                "type": "object",
+                "properties": {
+                  "reasoning_tokens": {
+                    "type": "number"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "prompt_tokens_details": {
+                "type": "object",
+                "properties": {
+                  "cached_tokens": {
+                    "type": "number"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "prompt_tokens",
+              "completion_tokens"
+            ],
+            "additionalProperties": false
+          },
+          "system_fingerprint": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "choices"
+        ],
+        "additionalProperties": false
+      },
+      "ChatCompletionChunk": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "object": {
+            "type": "string"
+          },
+          "created": {
+            "type": "number"
+          },
+          "model": {
+            "type": "string"
+          },
+          "choices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "number"
+                },
+                "delta": {
+                  "type": "object",
+                  "properties": {
+                    "role": {
+                      "type": "string"
+                    },
+                    "content": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "reasoning_content": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "tool_calls": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "index": {
+                            "type": "number"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "type": {
+                            "type": "string"
+                          },
+                          "function": {
+                            "type": "object",
+                            "properties": {
+                              "name": {
+                                "type": "string"
+                              },
+                              "arguments": {
+                                "type": "string"
+                              }
+                            },
+                            "additionalProperties": false
+                          }
+                        },
+                        "required": [
+                          "index"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "finish_reason": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "delta"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "usage": {
+            "type": "object",
+            "properties": {
+              "prompt_tokens": {
+                "type": "number"
+              },
+              "completion_tokens": {
+                "type": "number"
+              },
+              "total_tokens": {
+                "type": "number"
+              },
+              "completion_tokens_details": {
+                "type": "object",
+                "properties": {
+                  "reasoning_tokens": {
+                    "type": "number"
+                  }
+                },
+                "additionalProperties": false
+              },
+              "prompt_tokens_details": {
+                "type": "object",
+                "properties": {
+                  "cached_tokens": {
+                    "type": "number"
+                  }
+                },
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "prompt_tokens",
+              "completion_tokens"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": false
+      },
+      "ChatCompletionError": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "message": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "invalid_request_error",
+                  "authentication_error",
+                  "insufficient_quota",
+                  "rate_limit_error",
+                  "server_error"
+                ]
+              },
+              "param": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "code": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "detail": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "message",
+              "type",
+              "param",
+              "code"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "additionalProperties": false
+      },
+      "AnthropicMessagesRequest": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string"
+          },
+          "max_tokens": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 200000
+          },
+          "messages": {
+            "minItems": 1,
+            "maxItems": 1000,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role": {
+                  "type": "string",
+                  "enum": [
+                    "user",
+                    "assistant"
+                  ]
+                },
+                "content": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ],
+                        "additionalProperties": {}
+                      }
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "role",
+                "content"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "system": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": {}
+                }
+              }
+            ]
+          },
+          "stream": {
+            "default": false,
+            "type": "boolean"
+          },
+          "temperature": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "top_p": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "top_k": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "stop_sequences": {
+            "maxItems": 4,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "metadata": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          },
+          "tags": {
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9_.:-]{1,64}$"
+            }
+          },
+          "tools": {
+            "maxItems": 128,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": {
+                  "type": "string"
+                },
+                "input_schema": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {}
+                }
+              },
+              "required": [
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "tool_choice": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "auto"
+                  }
+                },
+                "required": [
+                  "type"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "any"
+                  }
+                },
+                "required": [
+                  "type"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "tool"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "type",
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "required": [
+          "model",
+          "max_tokens",
+          "messages",
+          "stream"
+        ],
+        "additionalProperties": false
+      },
+      "AnthropicCountTokensRequest": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string"
+          },
+          "messages": {
+            "minItems": 1,
+            "maxItems": 1000,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role": {
+                  "type": "string",
+                  "enum": [
+                    "user",
+                    "assistant"
+                  ]
+                },
+                "content": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "type": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "type"
+                        ],
+                        "additionalProperties": {}
+                      }
+                    }
+                  ]
+                }
+              },
+              "required": [
+                "role",
+                "content"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "system": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "type"
+                  ],
+                  "additionalProperties": {}
+                }
+              }
+            ]
+          }
+        },
+        "required": [
+          "model",
+          "messages"
+        ],
+        "additionalProperties": false
+      },
+      "ResponsesApiRequest": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string"
+          },
+          "input": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "role": {
+                      "type": "string",
+                      "enum": [
+                        "user",
+                        "assistant",
+                        "system",
+                        "developer"
+                      ]
+                    },
+                    "content": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "type"
+                            ],
+                            "additionalProperties": {}
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "role",
+                    "content"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            ]
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "stream": {
+            "default": false,
+            "type": "boolean"
+          },
+          "max_output_tokens": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 200000
+          },
+          "temperature": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 2
+          },
+          "top_p": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "metadata": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          },
+          "tags": {
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z0-9_.:-]{1,64}$"
+            }
+          },
+          "tools": {
+            "maxItems": 128,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "const": "function"
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "description": {
+                  "type": "string"
+                },
+                "parameters": {
+                  "type": "object",
+                  "propertyNames": {
+                    "type": "string"
+                  },
+                  "additionalProperties": {}
+                },
+                "strict": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "type",
+                "name"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "tool_choice": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "auto"
+              },
+              {
+                "type": "string",
+                "const": "none"
+              },
+              {
+                "type": "string",
+                "const": "required"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "const": "function"
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                },
+                "required": [
+                  "type",
+                  "name"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "store": {
+            "type": "boolean"
+          },
+          "text": {
+            "type": "object",
+            "properties": {
+              "format": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "text"
+                      }
+                    },
+                    "required": [
+                      "type"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "const": "json_schema"
+                      },
+                      "name": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "schema": {
+                        "type": "object",
+                        "propertyNames": {
+                          "type": "string"
+                        },
+                        "additionalProperties": {}
+                      },
+                      "strict": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "name"
+                    ],
+                    "additionalProperties": false
+                  }
+                ]
+              }
+            },
+            "required": [
+              "format"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "model",
+          "input",
+          "stream"
+        ],
+        "additionalProperties": false
+      },
+      "RerankRequest": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string"
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200000
+          },
+          "documents": {
+            "minItems": 1,
+            "maxItems": 1000,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200000
+            }
+          },
+          "top_n": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "return_documents": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "model",
+          "query",
+          "documents"
+        ],
+        "additionalProperties": false
+      },
+      "RerankResponse": {
+        "type": "object",
+        "properties": {
+          "object": {
+            "type": "string",
+            "const": "list"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "index": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 9007199254740991
+                },
+                "relevance_score": {
+                  "type": "number"
+                },
+                "document": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "index",
+                "relevance_score"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "model": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "object",
+          "results",
+          "model"
+        ],
+        "additionalProperties": false
+      },
+      "EmbeddingsRequest": {
+        "type": "object",
+        "properties": {
+          "input": {
+            "anyOf": [
+              {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200000
+              },
+              {
+                "minItems": 1,
+                "maxItems": 2048,
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200000
+                }
+              }
+            ]
+          },
+          "model": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "encoding_format": {
+            "type": "string",
+            "enum": [
+              "float",
+              "base64"
+            ]
+          },
+          "dimensions": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "input",
+          "model"
+        ],
+        "additionalProperties": false
+      },
+      "OAuthClientLookupResponse": {
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "display_name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "client_id",
+          "display_name"
+        ],
+        "additionalProperties": false
+      },
+      "OAuthApproveRequest": {
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "redirect_uri": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "code_challenge": {
+            "type": "string",
+            "minLength": 43,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.~-]+$"
+          },
+          "code_challenge_method": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 16
+          },
+          "scope": {
+            "type": "string",
+            "maxLength": 256
+          },
+          "state": {
+            "type": "string",
+            "maxLength": 512
+          },
+          "spend_cap_uusd": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "client_id",
+          "redirect_uri",
+          "code_challenge",
+          "code_challenge_method",
+          "spend_cap_uusd"
+        ],
+        "additionalProperties": false
+      },
+      "OAuthAuthorizeResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "expires_at_ms": {
+            "type": "number"
+          },
+          "state": {
+            "type": "string",
+            "maxLength": 512
+          }
+        },
+        "required": [
+          "code",
+          "expires_at_ms"
+        ],
+        "additionalProperties": false
+      },
+      "OAuthTokenRequest": {
+        "type": "object",
+        "properties": {
+          "grant_type": {
+            "type": "string",
+            "const": "authorization_code"
+          },
+          "code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512
+          },
+          "redirect_uri": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2048
+          },
+          "client_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "code_verifier": {
+            "type": "string",
+            "minLength": 43,
+            "maxLength": 128,
+            "pattern": "^[A-Za-z0-9_.~-]+$"
+          }
+        },
+        "required": [
+          "grant_type",
+          "code",
+          "redirect_uri",
+          "client_id",
+          "code_verifier"
+        ],
+        "additionalProperties": false
+      },
+      "OAuthTokenResponse": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string"
+          },
+          "token_type": {
+            "type": "string",
+            "const": "bearer"
+          },
+          "scope": {
+            "type": "string",
+            "const": "inference"
+          }
+        },
+        "required": [
+          "access_token",
+          "token_type",
+          "scope"
+        ],
+        "additionalProperties": false
+      },
+      "OAuthErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "error_description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error",
+          "error_description"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "paths": {
+    "/v1/chat/completions": {
+      "post": {
+        "operationId": "chat-completions",
+        "summary": "Run a chat completion, streaming or not.",
+        "description": "OpenAI-compatible. Accepts the same `messages` array any OpenAI SDK sends. Set `stream: true` for a server-sent-events response identical in shape to OpenAI's own streaming format -- the same client code that works against api.openai.com works here with one base-URL change. #1761: send an optional `Idempotency-Key` header to retry safely -- a dropped connection can't tell you whether the request billed, and this lets a retry find out instead of guessing. Same key + same request body within 24h replays the ORIGINAL response verbatim (tagged `Idempotency-Replayed: true`) and bills nothing a second time; the same key with a different body is rejected (422), and two concurrent requests sharing a key resolve as one success and one 409, never two charges. Scoped to your account, so a key you reuse is never visible to (or replayable by) any other account. Not supported on a streaming request (`stream: true`) -- a partially-delivered SSE stream can't be replayed honestly, so a keyed streaming request is refused (422) rather than silently ignoring the key.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatCompletionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Run a chat completion, streaming or not. Success. When the request body sets `\"stream\": true`, the response is `Content-Type: text/event-stream`, not the single JSON document this section's `application/json` schema describes: a sequence of `data: <json>\\n\\n` frames, each JSON payload shaped like `ChatCompletionChunk` (see `components.schemas.ChatCompletionChunk`), terminated by a literal `data: [DONE]` frame. OpenAPI 3.1 has no vocabulary for \"a stream of this shape\" -- this is stated in prose rather than modelled as a false single-object response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatCompletionResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error. Every non-2xx response from this surface uses this same envelope. `error.type` is one of: `invalid_request_error`, `authentication_error`, `insufficient_quota`, `rate_limit_error`, `server_error`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatCompletionError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/rerank": {
+      "post": {
+        "operationId": "rerank",
+        "summary": "Score documents against a query with a cross-encoder, most relevant first.",
+        "description": "`documents[].index` in the response is ALWAYS the position the document held in YOUR `documents` array, never the position in the sorted result -- look a scored document back up by that index, not by counting through the response. Omit `top_n` to get every document scored; set it to get only the top N. Set `return_documents: true` to have each result echo its own document text back (otherwise only the index and score are returned). Supports an optional `Idempotency-Key` header, same replay/conflict/body-mismatch contract as `/v1/chat/completions` (see that endpoint's own description).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RerankRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Score documents against a query with a cross-encoder, most relevant first.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RerankResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error. See docs/reference/openapi.md for this surface's error envelope.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/embeddings": {
+      "post": {
+        "operationId": "embeddings",
+        "summary": "Embed text into a vector, for a model your operator has explicitly configured for it.",
+        "description": "OpenAI-compatible. `model` must be one this deployment has declared `capabilities.embedding: true` for -- GET /openai/v1/models reports that flag per model, same as it reports `capabilities.vision`/`tools`. A model that exists but was never declared embedding-capable (every chat model, in a default deployment) answers `model_not_found` (400) -- this route never silently serves a chat model's output as an \"embedding\". `input` accepts either a single string or a batch (array of strings, up to 2048 items); a failed upstream call refunds the reservation in full and settles no charge -- the same fail-closed discipline /v1/chat/completions applies. #1761's Idempotency-Key contract carries over unchanged: same key + same body replays the original response and bills nothing a second time.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmbeddingsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Embed text into a vector, for a model your operator has explicitly configured for it.",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "description": "No shared, machine-checked schema exists for this body yet (see docs/reference/openapi.md's \"deliberately excluded\" section). Shape shown here verbatim from apps/console's own API-console reference:\n\n```\n{\n  \"object\": \"list\",\n  \"data\": [{ \"object\": \"embedding\", \"index\": 0, \"embedding\": [0.0] }],\n  \"model\": \"string\",\n  \"usage\": { \"prompt_tokens\": 0, \"total_tokens\": 0 }\n}\n```"
+              }
+            }
+          },
+          "default": {
+            "description": "Error. See docs/reference/openapi.md for this surface's error envelope.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/models": {
+      "get": {
+        "operationId": "models",
+        "summary": "List models this deployment currently serves.",
+        "description": "Public, unauthenticated. Each entry carries its own per-token price under `pricing` (#167) -- there is no separate pricing call to make before you can quote a cost.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "List models this deployment currently serves.",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "description": "No shared, machine-checked schema exists for this body yet (see docs/reference/openapi.md's \"deliberately excluded\" section). Shape shown here verbatim from apps/console's own API-console reference:\n\n```\n{\n  \"object\": \"list\",\n  \"data\": [{\n    \"id\": \"string\",\n    \"object\": \"model\",\n    \"created\": 0,\n    \"owned_by\": \"dicompute\",\n    \"pricing\": { \"input_uusd_per_mtok\": 0, \"output_uusd_per_mtok\": 0 }\n  }]\n}\n```"
+              }
+            }
+          },
+          "default": {
+            "description": "Error. See docs/reference/openapi.md for this surface's error envelope.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/models/{id}": {
+      "get": {
+        "operationId": "models-retrieve",
+        "summary": "Retrieve one model by id.",
+        "description": "OpenAI's `retrieve model` call (#246). Several SDKs and gateways pre-fetch a single model before sending a completion; this used to 404 unconditionally. A model id may itself contain `/` (e.g. `meta-llama/Llama-3-8B`) -- both the raw and percent-encoded spelling resolve to the same model.",
+        "security": [],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Matched against apps/api's own wildcard route (`/v1/models/*`), not a single path segment -- see this operation's own description for why."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Retrieve one model by id.",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "description": "No shared, machine-checked schema exists for this body yet (see docs/reference/openapi.md's \"deliberately excluded\" section). Shape shown here verbatim from apps/console's own API-console reference:\n\n```\n{ \"id\": \"string\", \"object\": \"model\", \"created\": 0, \"owned_by\": \"dicompute\",\n  \"pricing\": { \"input_uusd_per_mtok\": 0, \"output_uusd_per_mtok\": 0 } }\n```"
+              }
+            }
+          },
+          "default": {
+            "description": "Error. See docs/reference/openapi.md for this surface's error envelope.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/pricing": {
+      "get": {
+        "operationId": "pricing",
+        "summary": "Per-model rates, posted before every request.",
+        "description": "Public, unauthenticated (#167). Per-token input/output rate for every model this deployment serves, plus the minimum per-request charge every settlement floors to -- the same rate `/v1/account/usage` bills against, so a partner reconciling costs never meets a second, competing number.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Per-model rates, posted before every request.",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "description": "No shared, machine-checked schema exists for this body yet (see docs/reference/openapi.md's \"deliberately excluded\" section). Shape shown here verbatim from apps/console's own API-console reference:\n\n```\n{\n  \"object\": \"list\",\n  \"unit\": \"usd_per_1m_tokens\",\n  \"min_charge_uusd\": 0,\n  \"data\": [{ \"id\": \"string\", \"model\": \"string\", \"input_usd\": \"string\", \"output_usd\": \"string\" }]\n}\n```"
+              }
+            }
+          },
+          "default": {
+            "description": "Error. See docs/reference/openapi.md for this surface's error envelope.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/stats": {
+      "get": {
+        "operationId": "stats",
+        "summary": "Live network stats -- the same feed this site's /stats page reads.",
+        "description": "Public, unauthenticated, cached briefly server-side. Powers the network-stats page.",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Live network stats -- the same feed this site's /stats page reads.",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "description": "No shared, machine-checked schema exists for this body yet (see docs/reference/openapi.md's \"deliberately excluded\" section). Shape shown here verbatim from apps/console's own API-console reference:\n\n```\n{ \"object\": \"stats\", \"...\": \"see /stats for the rendered version of this feed\" }\n```"
+              }
+            }
+          },
+          "default": {
+            "description": "Error. See docs/reference/openapi.md for this surface's error envelope.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/models/capacity": {
+      "get": {
+        "operationId": "models-capacity",
+        "summary": "Per-model live capacity signal.",
+        "description": "Public, unauthenticated, cached briefly server-side. Useful before a batch job to see whether a model is currently near its upstream concurrency ceiling (the same ceiling a 429 `at_capacity` enforces).",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Per-model live capacity signal.",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "description": "No shared, machine-checked schema exists for this body yet (see docs/reference/openapi.md's \"deliberately excluded\" section). Shape shown here verbatim from apps/console's own API-console reference:\n\n```\n{ \"object\": \"list\", \"data\": [{ \"model\": \"string\", \"...\": \"per-model capacity fields\" }] }\n```"
+              }
+            }
+          },
+          "default": {
+            "description": "Error. See docs/reference/openapi.md for this surface's error envelope.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/keys/revoke": {
+      "post": {
+        "operationId": "keys-revoke",
+        "summary": "Revoke the key that authenticated this request.",
+        "description": "Possession of the key IS the authorization -- there is no admin capability and no way to revoke a key you don't hold. Use this the moment a key leaks; there is no separate rotation endpoint, so the pattern is revoke, then sign up (or request a new partner key) again.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Revoke the key that authenticated this request.",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "description": "No shared, machine-checked schema exists for this body yet (see docs/reference/openapi.md's \"deliberately excluded\" section). Shape shown here verbatim from apps/console's own API-console reference:\n\n```\n{ \"revoked\": true }\n```"
+              }
+            }
+          },
+          "default": {
+            "description": "Error. See docs/reference/openapi.md for this surface's error envelope.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/account/balance": {
+      "get": {
+        "operationId": "account-balance",
+        "summary": "Your key's spendable balance, reserved holds, and rates (#147).",
+        "description": "Read-only introspection -- no way to see any account but the one your bearer key belongs to. `balance_uusd` is already net of every in-flight reservation; `reserved_uusd` is reported separately rather than double-subtracted. Never cached (`cache-control: no-store`).",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Your key's spendable balance, reserved holds, and rates (#147).",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "description": "No shared, machine-checked schema exists for this body yet (see docs/reference/openapi.md's \"deliberately excluded\" section). Shape shown here verbatim from apps/console's own API-console reference:\n\n```\n{\n  \"object\": \"balance\",\n  \"account\": \"string\",\n  \"balance_uusd\": 0,\n  \"balance_usd\": \"string\",\n  \"reserved_uusd\": 0,\n  \"open_reservations\": 0,\n  \"pricing\": { \"input_uusd_per_mtok\": 0, \"output_uusd_per_mtok\": 0, \"min_charge_uusd\": 0 },\n  \"key\": { \"id\": \"string\", \"kind\": \"signup\" }\n}\n```"
+              }
+            }
+          },
+          "default": {
+            "description": "Error. See docs/reference/openapi.md for this surface's error envelope.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/account/usage": {
+      "get": {
+        "operationId": "account-usage",
+        "summary": "Itemised ledger history for your account, newest first (#147).",
+        "description": "One row per balance movement (reserve/settle/refund/deposit), each settle row naming the model, tokens, and price it was billed on -- straight off the same journal the money path itself writes, so this can never report a number different from what was actually charged. `?limit=` and `?since=` (epoch ms) narrow the window.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Itemised ledger history for your account, newest first (#147).",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "description": "No shared, machine-checked schema exists for this body yet (see docs/reference/openapi.md's \"deliberately excluded\" section). Shape shown here verbatim from apps/console's own API-console reference:\n\n```\n{\n  \"object\": \"list\",\n  \"account\": \"string\",\n  \"limit\": 50,\n  \"since\": \"2026-01-01T00:00:00.000Z\",\n  \"settled_uusd\": 0,\n  \"data\": [{ \"id\": 0, \"type\": \"settle\", \"delta_uusd\": 0, \"balance_after_uusd\": 0, \"created_at\": \"...\", \"reference\": {} }]\n}\n```"
+              }
+            }
+          },
+          "default": {
+            "description": "Error. See docs/reference/openapi.md for this surface's error envelope.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/provider/earnings": {
+      "get": {
+        "operationId": "provider-earnings",
+        "summary": "Your accrued provider earnings balance, unpaid or paid (#832).",
+        "description": "The EARNING side of an account -- what capacity you've served has accrued -- as opposed to `/v1/account/balance` above, which is the SPENDING side. Session-only: a spending key is refused with `session_required`, same as every `/v1/payouts/*` route; mint a session from `/v1/sessions` first. `balance_uusd` is computed by the exact same function `/v1/payouts/status`'s own balance field calls, so the two can never silently disagree. `null` (not `0`) means the earnings store isn't wired on this deploy yet, not that your balance is genuinely zero.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Your accrued provider earnings balance, unpaid or paid (#832).",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "description": "No shared, machine-checked schema exists for this body yet (see docs/reference/openapi.md's \"deliberately excluded\" section). Shape shown here verbatim from apps/console's own API-console reference:\n\n```\n{\n  \"object\": \"provider_earnings\",\n  \"account\": \"string\",\n  \"balance_uusd\": 0,\n  \"provider_earnings_configured\": true\n}\n```"
+              }
+            }
+          },
+          "default": {
+            "description": "Error. See docs/reference/openapi.md for this surface's error envelope.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/me": {
+      "get": {
+        "operationId": "me",
+        "summary": "Self-service snapshot: balance, keys, and recent usage in one call (#290).",
+        "description": "Accepts either a spending key (if it carries the `billing:read` scope every default key has) or a browsing session minted from `/v1/sessions` below. Powers the console's own account dashboard.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Self-service snapshot: balance, keys, and recent usage in one call (#290).",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "description": "No shared, machine-checked schema exists for this body yet (see docs/reference/openapi.md's \"deliberately excluded\" section). Shape shown here verbatim from apps/console's own API-console reference:\n\n```\n{\n  \"account\": \"string\",\n  \"balanceUusd\": 0,\n  \"keys\": [{ \"id\": \"string\", \"kind\": \"signup\" }],\n  \"recentUsage\": [{ \"id\": 0, \"entryType\": \"settle\", \"deltaUusd\": 0 }]\n}\n```"
+              }
+            }
+          },
+          "default": {
+            "description": "Error. See docs/reference/openapi.md for this surface's error envelope.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/sessions": {
+      "post": {
+        "operationId": "sessions",
+        "summary": "Mint a short-lived browsing session from your key (#290).",
+        "description": "Trades your spending key for a narrowly-scoped session token suitable for a browser tab -- useful if you're building your own dashboard on top of `/v1/me` and don't want your long-lived key sitting in page JS. A session cannot mint another session.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Mint a short-lived browsing session from your key (#290).",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "description": "No shared, machine-checked schema exists for this body yet (see docs/reference/openapi.md's \"deliberately excluded\" section). Shape shown here verbatim from apps/console's own API-console reference:\n\n```\n{ \"token\": \"dico-sess-...\", \"expiresAt\": \"2026-01-01T00:00:00.000Z\" }\n```"
+              }
+            }
+          },
+          "default": {
+            "description": "Error. See docs/reference/openapi.md for this surface's error envelope.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/responses": {
+      "post": {
+        "operationId": "responses",
+        "summary": "OpenAI Responses API compatibility (#288).",
+        "description": "For SDKs and tools already speaking OpenAI's newer Responses API shape rather than `/v1/chat/completions`. Translated to and from the same completion path underneath, so it bills and streams identically -- pick whichever shape your existing client already sends. `Idempotency-Key` (#1761) is honoured the same way as on `/v1/chat/completions` -- see that endpoint's own description.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResponsesApiRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OpenAI Responses API compatibility (#288). Success. When the request body sets `\"stream\": true`, the response is `Content-Type: text/event-stream`, not the single JSON document this section's `application/json` schema describes: a sequence of `data: <json>\\n\\n` frames, each JSON payload shaped like `ChatCompletionChunk` (see `components.schemas.ChatCompletionChunk`), terminated by a literal `data: [DONE]` frame. OpenAPI 3.1 has no vocabulary for \"a stream of this shape\" -- this is stated in prose rather than modelled as a false single-object response.",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "description": "No shared, machine-checked schema exists for this body yet (see docs/reference/openapi.md's \"deliberately excluded\" section). Shape shown here verbatim from apps/console's own API-console reference:\n\n```\n{ \"id\": \"resp_...\", \"object\": \"response\", \"output\": [{ \"content\": [{ \"text\": \"string\" }] }] }\n```"
+              }
+            }
+          },
+          "default": {
+            "description": "Error. See docs/reference/openapi.md for this surface's error envelope.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/messages": {
+      "post": {
+        "operationId": "messages",
+        "summary": "Anthropic Messages API compatibility (#288).",
+        "description": "For clients built against Anthropic's wire format (`x-api-key` header, `messages` shape). Translated to and from the same completion path underneath -- same billing, same models. `Idempotency-Key` (#1761) is honoured the same way as on `/v1/chat/completions` -- see that endpoint's own description.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnthropicMessagesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Anthropic Messages API compatibility (#288). Success. When the request body sets `\"stream\": true`, the response is `Content-Type: text/event-stream`, not the single JSON document this section's `application/json` schema describes: a sequence of `data: <json>\\n\\n` frames, each JSON payload shaped like `ChatCompletionChunk` (see `components.schemas.ChatCompletionChunk`), terminated by a literal `data: [DONE]` frame. OpenAPI 3.1 has no vocabulary for \"a stream of this shape\" -- this is stated in prose rather than modelled as a false single-object response.",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "description": "No shared, machine-checked schema exists for this body yet (see docs/reference/openapi.md's \"deliberately excluded\" section). Shape shown here verbatim from apps/console's own API-console reference:\n\n```\n{ \"id\": \"msg_...\", \"type\": \"message\", \"role\": \"assistant\", \"content\": [{ \"type\": \"text\", \"text\": \"string\" }] }\n```"
+              }
+            }
+          },
+          "default": {
+            "description": "Error. See docs/reference/openapi.md for this surface's error envelope.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/messages/count_tokens": {
+      "post": {
+        "operationId": "messages-count-tokens",
+        "summary": "Estimate token usage for an Anthropic Messages request (#2274).",
+        "description": "Matches the real Anthropic SDK's `client.messages.countTokens(...)` call. `input_tokens` is an ESTIMATE -- the same script-aware chars-based heuristic this deployment's real /v1/messages requests already use to size their reservation, not a claim of exact-tokenizer accuracy no engine here can back up. Stateless: no reservation, no ledger entry, no dispatch to any worker.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnthropicCountTokensRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Estimate token usage for an Anthropic Messages request (#2274).",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "description": "No shared, machine-checked schema exists for this body yet (see docs/reference/openapi.md's \"deliberately excluded\" section). Shape shown here verbatim from apps/console's own API-console reference:\n\n```\n{ \"input_tokens\": 12 }\n```"
+              }
+            }
+          },
+          "default": {
+            "description": "Error. See docs/reference/openapi.md for this surface's error envelope.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/oauth/clients/{client_id}": {
+      "get": {
+        "operationId": "oauth-clients-lookup",
+        "summary": "Look up an OAuth client's public display metadata.",
+        "description": "Public, unauthenticated client-metadata lookup -- what the hosted `/authorize` consent page itself calls before rendering a consent form. `redirect_uri` must exactly match the client's registered value (see #1738's exact-match policy). See docs/reference/http-api.md's OAuth section, \"Step 2\".",
+        "security": [],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "redirect_uri",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Checked by exact string equality against this client's registration."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The client is live and this redirect_uri matches its registration.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthClientLookupResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error -- RFC 6749 §5.2 shape. See docs/reference/http-api.md's \"OAuth 2.0 for third-party apps\" § Error contract for the full list of `error` values this surface returns.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/oauth/authorize": {
+      "post": {
+        "operationId": "oauth-authorize",
+        "summary": "Approve a pending OAuth consent request and mint a single-use authorization code.",
+        "description": "The consent-APPROVAL step, called by the hosted `/authorize` page's own consent form on a signed-in user's behalf (most integrators using the hosted page never call this directly -- see docs/reference/http-api.md's own header on this operation). Requires a signed-in caller (session or key) scoped to `billing:read`. `code_challenge_method` must be `S256` -- `plain` is refused here, before a code is ever minted. Returns a code, never a token (#1738's \"no implicit flow\").",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OAuthApproveRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A single-use, 5-minute authorization code was minted for this grant.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthAuthorizeResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error -- RFC 6749 §5.2 shape. See docs/reference/http-api.md's \"OAuth 2.0 for third-party apps\" § Error contract for the full list of `error` values this surface returns.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/oauth/token": {
+      "post": {
+        "operationId": "oauth-token",
+        "summary": "Exchange an authorization code for an access token (PKCE, no client_secret).",
+        "description": "The TOKEN EXCHANGE, called server-to-server by the third-party app's own backend -- never from a browser, and never with a `client_secret` (there is no such field; PKCE alone authenticates this request). The code is single-use with a 5-minute TTL. The response has no `expires_in`/`refresh_token`: the minted credential lives until the user revokes it from `/settings/keys` -- see docs/reference/http-api.md's OAuth section for why this is a documented property, not an omission.",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OAuthTokenRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The code was redeemed. No expires_in/refresh_token -- see this operation's own description.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthTokenResponse"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error -- RFC 6749 §5.2 shape. See docs/reference/http-api.md's \"OAuth 2.0 for third-party apps\" § Error contract for the full list of `error` values this surface returns.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OAuthErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
