@@ -6724,6 +6724,107 @@
           }
         }
       },
+      "patch": {
+        "operationId": "files-update",
+        "summary": "Rename an uploaded or generated file.",
+        "description": "Changes only the file's `filename` -- its bytes, `purpose`, and any batch that references it are untouched. A browser session works here, same as `DELETE /v1/files/{id}` above; an API key needs the `storage:write` scope (otherwise `403`). The body must be a JSON object with exactly one field, `filename`: 1-255 characters, no control characters; any other field, or a body that is not valid JSON, is a `400` naming the offending `param`. Scoped to your own account in the query itself -- a wrong-account or nonexistent id both 404 identically as `{\"error\": {\"message\": \"no such file\",...}}`. `204 No Content` on success; read the new name back with `GET /v1/files/{id}`.",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Matched against this deployment's own wildcard route (`/v1/files/:id`), not a single path segment -- see this operation's own description for why."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "No shared, machine-checked schema exists for this body yet. Shape shown here verbatim from this deployment's own API-console reference: ```\n{ \"filename\": \"string (required, 1-255 chars, no control characters)\"\n}\n```",
+          "content": {
+            "application/json": {
+              "schema": {},
+              "examples": {
+                "curl-0": {
+                  "summary": "curl",
+                  "description": "A bash example -- the same snippet this deployment's own API console renders for this operation.",
+                  "value": "curl -X PATCH {{BASE_URL}}/files/file_... \\ -H \"authorization: Bearer {{API_KEY}}\" \\ -H \"content-type: application/json\" \\ -d '{\"filename\":\"renamed.jsonl\"}'"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Rename an uploaded or generated file.",
+            "content": {
+              "application/json": {
+                "schema": {},
+                "description": "No shared, machine-checked schema exists for this body yet. Shape shown here verbatim from this deployment's own API-console reference: ```\n204 No Content\n```",
+                "examples": {
+                  "curl-0": {
+                    "summary": "curl",
+                    "description": "A bash example -- the same snippet this deployment's own API console renders for this operation.",
+                    "value": "curl -X PATCH {{BASE_URL}}/files/file_... \\ -H \"authorization: Bearer {{API_KEY}}\" \\ -H \"content-type: application/json\" \\ -d '{\"filename\":\"renamed.jsonl\"}'"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The request body failed validation (`error.type: \"invalid_request_error\"`) -- the same envelope every other non-2xx response on this surface uses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatCompletionError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "No credential was presented, or the one presented was rejected -- the same envelope every other non-2xx response on this surface uses (`error.type: \"authentication_error\"`). Per RFC 9110 s15.5.2 this response also always carries a `WWW-Authenticate` challenge (DICOMPUTE/Open): `Bearer realm=\"<deployment>\"` when no credential was presented at all, or that same challenge plus `error=\"invalid_token\"` (RFC 6750 s3.1) when one was presented and rejected.",
+            "headers": {
+              "WWW-Authenticate": {
+                "description": "The RFC 9110 challenge -- see this response's own description for the two forms it takes.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatCompletionError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No resource exists at this id (`error.type: \"invalid_request_error\"`) -- the same envelope every other non-2xx response on this surface uses.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatCompletionError"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "Error.",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      },
       "get": {
         "operationId": "files-get",
         "summary": "Retrieve metadata for an uploaded or generated file.",
