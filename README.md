@@ -6,7 +6,7 @@ micro-USD and settled on XDC.
 
 **Base URL:** `https://dicompute.ai/openai`
 
-[`openapi.json`](openapi.json) describes 20 endpoints. Point Postman, Insomnia,
+[`openapi.json`](openapi.json) describes 175 operations across 140 paths (spec v1.12). Point Postman, Insomnia,
 Stoplight, or any OpenAPI code generator at it.
 
 ```bash
