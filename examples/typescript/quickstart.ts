@@ -12,9 +12,8 @@ const apiKey = process.env.DICO_KEY;
 
 if (!apiKey) {
   console.error(
-    "Set DICO_KEY first. Mint one with:\n" +
-      "  curl -sS -X POST https://dicompute.ai/api/signup \\\n" +
-      "    -H 'content-type: application/json' -d '{\"email\":\"you@example.com\"}'",
+    "Set DICO_KEY first. Get a key in the console:\n" +
+      "  https://dicompute.ai/console#onboarding",
   );
   process.exit(1);
 }

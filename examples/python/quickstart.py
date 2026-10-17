@@ -13,9 +13,8 @@ BASE_URL = os.environ.get("DICO_BASE_URL", "https://dicompute.ai/openai/v1")
 api_key = os.environ.get("DICO_KEY")
 if not api_key:
     raise SystemExit(
-        "Set DICO_KEY first. Mint one with:\n"
-        "  curl -sS -X POST https://dicompute.ai/api/signup \\\n"
-        "    -H 'content-type: application/json' -d '{\"email\":\"you@example.com\"}'"
+        "Set DICO_KEY first. Get a key in the console:\n"
+        "  https://dicompute.ai/console#onboarding"
     )
 
 client = OpenAI(base_url=BASE_URL, api_key=api_key)
