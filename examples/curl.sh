@@ -13,9 +13,10 @@ curl -sS "$BASE/v1/pricing"
 
 if [ -z "${DICO_KEY:-}" ]; then
   echo
-  echo "Set DICO_KEY to run the authenticated calls. Mint one with:"
-  echo "  curl -sS -X POST https://dicompute.ai/api/signup \\"
-  echo "    -H 'content-type: application/json' -d '{\"email\":\"you@example.com\"}'"
+  echo "Set DICO_KEY to run the authenticated calls. Get a key in the console:"
+  echo "  https://dicompute.ai/console#onboarding"
+  echo "(email, 6-digit code, accept terms; the key is shown once). Scripted"
+  echo "signup is a multi-step flow, see the README."
   exit 0
 fi
 

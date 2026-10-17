@@ -16,17 +16,39 @@ npx @redocly/cli preview-docs \
 
 ## Two minutes to a first call
 
-No account, no password, no credit card. Signup mints a key with real starting credit.
+No password, no credit card. Signup needs a mailbox you control and acceptance
+of the current terms of service and privacy policy, and mints a key with real
+starting credit.
+
+**The console is the fast path:** open
+[dicompute.ai/console#onboarding](https://dicompute.ai/console#onboarding),
+enter your email, enter the 6-digit code it sends you, accept the terms, and
+your key is shown once.
+
+Scripting it is possible but is a three-step flow, not a single call. A bare
+`POST /api/signup` with only an email is refused with `400 invalid request`.
 
 ```bash
-curl -sS -X POST https://dicompute.ai/api/signup \
+# 1. request a 6-digit code (sent to your inbox)
+curl -sS -X POST https://dicompute.ai/api/auth/email/send \
   -H 'content-type: application/json' \
   -d '{"email":"you@example.com"}'
+
+# 2. mint the key: the code, plus the current terms/privacy versions
+#    (the console form fills these in for you)
+curl -sS -X POST https://dicompute.ai/api/signup \
+  -H 'content-type: application/json' \
+  -d '{"email":"you@example.com","code":"123456","acceptedTosVersion":"<current>","acceptedPrivacyVersion":"<current>"}'
 # => {"apiKey":"sk-dico-...","account":"signup-...","startingBalanceUusd":100000}
 ```
 
-> The key is returned **exactly once** — there is no recovery flow. Copy it now.
-> `startingBalanceUusd` is micro-USD: 100,000 µUSD = $0.10.
+> If step 1 answers `503 email_delivery_unconfigured` (email
+> sign-in is not available on the deployment), use the console or wallet sign-in instead. A bot
+> check may also apply to scripted calls; the console handles it for you.
+
+> The key is shown **exactly once**. If you lose it, the console's
+> Settings -> Keys "Lost your API key" flow mints one replacement (it does not
+> re-show the old secret). `startingBalanceUusd` is micro-USD: 100,000 uUSD = $0.10.
 
 ```bash
 export DICO_KEY="sk-dico-..."
