@@ -73,6 +73,26 @@ from openai import OpenAI
 client = OpenAI(base_url="https://dicompute.ai/openai/v1", api_key="sk-dico-...")
 ```
 
+## Migration notes
+
+Contract **1.12** (2026-10-11) renamed several path template parameters from
+camelCase to snake_case inside a minor version bump (#1793). The URL text is
+byte-identical either way, so curl-based checks cannot see the change — but
+**regenerated clients rename the accessor field**, and code compiled against
+an older spec keeps calling the old name. Affected parameters:
+
+| Route family | Old name | Current name |
+|---|---|---|
+| `GET /v1/account/usage/requests/{...}` | `requestId` | `request_id` |
+| OAuth authorize/token family | `clientId`, `redirectUri` | `client_id`, `redirect_uri` |
+| Chat-scoped routes | `chatId` | `chat_id` |
+
+If you pin a generated SDK, regenerate it against 1.12+ and rename the
+affected accessors, or hold your generator at 1.10 until you can. Both
+spellings may still appear on OTHER, unrelated routes (`{requestId}/otlp`
+keeps the old spelling — it is a different endpoint, not an alias), so do
+not blanket-search-and-replace across the document.
+
 ## Endpoints
 
 Resolve model ids from `/v1/models` at runtime — the catalog changes, and
