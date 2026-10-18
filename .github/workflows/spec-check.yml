@@ -1,0 +1,68 @@
+name: spec-check
+# #1789: this repo regenerates openapi.json by hand and it already drifted
+# from the served spec once, silently. Two jobs: `validate` keeps an
+# unparseable or shapeless spec out of main; `served-drift` comments the
+# repo-vs-live delta on every PR touching openapi.json (never fails -- the
+# live site being down or behind is a notice, not a PR blocker).
+on:
+  pull_request:
+    paths: [openapi.json]
+  push:
+    branches: [main]
+    paths: [openapi.json]
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+      - name: openapi.json parses and carries the minimum shape
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          spec = json.load(open("openapi.json"))
+          for key in ("openapi", "info", "paths"):
+              if key not in spec:
+                  sys.exit(f"openapi.json is missing required top-level key: {key}")
+          if not isinstance(spec["paths"], dict) or not spec["paths"]:
+              sys.exit("openapi.json has an empty paths map")
+          print(f"openapi {spec['openapi']}, {len(spec['paths'])} paths: ok")
+          PY
+  served-drift:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
+      - name: measure drift against the served spec
+        id: drift
+        run: |
+          set +e
+          python3 .github/scripts/spec-drift.py > drift.txt 2> drift.err
+          code=$?
+          set -e
+          echo "exit=$code" >> "$GITHUB_OUTPUT"
+          cat drift.txt drift.err
+      - name: comment the delta on the PR
+        if: github.event_name == 'pull_request' && steps.drift.outputs.exit != '2'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          if grep -q '^IN_SYNC$' drift.txt; then
+            echo "spec in sync with the served copy; no comment needed"
+          else
+            {
+              echo "### Spec drift vs the live site (#1789)"
+              echo
+              echo "\`openapi.json\` on this branch differs from the spec served at https://dicompute.ai/openapi.json:"
+              echo
+              echo '```'
+              cat drift.txt
+              echo '```'
+              echo
+              echo "One of the two copies is stale -- deploy the site or merge this, and regenerate the other. This comment is informational; the check never blocks."
+            } | gh pr comment "$PR" --body-file -
+          fi
