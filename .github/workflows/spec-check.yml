@@ -38,7 +38,13 @@ jobs:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
       - name: measure drift against the served spec
         id: drift
-        run: python3 .github/scripts/spec-drift.py > drift.txt 2> drift.err; echo "exit=$?" >> "$GITHUB_OUTPUT"; cat drift.txt drift.err
+        run: |
+          set +e
+          python3 .github/scripts/spec-drift.py > drift.txt 2> drift.err
+          code=$?
+          set -e
+          echo "exit=$code" >> "$GITHUB_OUTPUT"
+          cat drift.txt drift.err
       - name: comment the delta on the PR
         if: github.event_name == 'pull_request' && steps.drift.outputs.exit != '2'
         env:
